@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import UserNavbar from '../components/UserNavbar';
 const IssueForm = () => {
   const [issues, setIssues] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');  // Define statusFilter state
@@ -54,7 +54,7 @@ const IssueForm = () => {
   
 
   return (
-    <> <Navbar />
+    <> <UserNavbar />
     <div className="container p-8 text-sm">
       <h1 className="text-2xl font-semibold mb-6">Issues</h1>
 

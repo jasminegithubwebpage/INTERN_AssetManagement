@@ -79,7 +79,7 @@ router.get("/list",async(req,res)=>{
   try{
     await sql.connect(config);
      const result=await
-    sql.query(' SELECT i.t_isno,i.t_ists,i.t_isdt,i.t_idsc,i.t_asno,i.t_emno,a.t_nama,e.t_nama as empname from ttxtvs1159001 i left join ttxtvs1109001 a on  i.t_asno = a.t_asno left join ttccom0019001 e on e.t_emno = a.t_cusr;')
+    sql.query(' SELECT i.t_isno,i.t_ists,i.t_isdt,i.t_idsc,i.t_asno,i.t_emno,i.t_hcmt,a.t_nama,e.t_nama as empname from ttxtvs1159001 i left join ttxtvs1109001 a on  i.t_asno = a.t_asno left join ttccom0019001 e on e.t_emno = a.t_cusr;')
     console.log('All the issues',result.recordset); 
     res.json(result.recordset);
 

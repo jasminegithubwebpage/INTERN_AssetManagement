@@ -15,7 +15,7 @@ const AssetIssues = () => {
   const [command, setCommand] = useState("");
 
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     // Fetch employee names
     axiosInstance
@@ -76,7 +76,7 @@ if (selectedEmp && selectedEmp.value !== "none") {
           filteredIssues = filteredIssues.filter(
             (issue) =>
               issue.t_idsc.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-              issue.empname.toLowerCase().includes(searchKeyword.toLowerCase())
+              issue.t_hcmt.toLowerCase().includes(searchKeyword.toLowerCase())
           );
         }
 

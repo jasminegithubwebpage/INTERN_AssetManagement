@@ -7,8 +7,11 @@ import Login from './pages/Login';
 import IssueForm from './pages/IssueForm';
 import NewIssuePage from './pages/NewIssuePage';
 import AssetIssues from './pages/AssetIssues';
+import UserLogin from './pages/UserLogin';
+import { UserProvider } from './pages/UserContext';
 function App() {
   return (
+  <UserProvider>
     <Router>
       
       <Routes>
@@ -16,13 +19,15 @@ function App() {
            
           <Route path="/assets" element={<Layout><AssetList /></Layout>} /> {/* Assets List */}
           <Route path="/assets/:asno" element={<Layout><AssetDetail /></Layout>} /> {/* Asset Detail */}
-          <Route path="/issues/:emno" element={<IssueForm />} />
+          <Route path="users/issues/:emno" element={<IssueForm />} />
           {/* <Route path="/new-issue/:empId" element = {<NewIssuePage />}/> */}
           <Route path="/new-issue/:empId" element={<NewIssuePage />} />
           <Route path="/Asset-Issues" element={<Layout><AssetIssues /></Layout>} />
+          <Route path = "/users" element={<UserLogin />} />
           </Routes>
     
     </Router>
+    </UserProvider>
   );
 }
 

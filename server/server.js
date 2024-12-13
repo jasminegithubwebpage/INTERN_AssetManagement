@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors'); 
 const bodyParser = require('body-parser'); // Optional, but express.json() is sufficient
-
+const UserLoginRoute = require('./routes/UserLoginCheck');
 // Middleware to parse JSON request bodies
 app.use(express.json()); 
 // const sqlRoutes = require('./routes/AssetListRoutes'); // Import the route file
@@ -24,9 +24,9 @@ app.get('/', (req, res) => {
 });
 // app.get('/issues',IssuesCheck)
 app.use('/issues', IssuesCheck);
-
+app.use('/user',UserLoginRoute);
 // Start server
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
