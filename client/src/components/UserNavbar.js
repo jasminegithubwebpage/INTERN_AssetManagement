@@ -1,25 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../pages/UserContext';
-import axiosInstance from '../axiosInstance';
+ // Import the jwt-decode library
+import { jwtDecode } from 'jwt-decode';
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, loginTime, logout } = useUser();
-  console.log(user);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token'); // Get token from localStorage
+    if (token) {
+      try {
+        const decoded = jwtDecode(token); // Decode the token to get user data
+        setUserName(decoded.name); // Set the user's name from the decoded token
+      } catch (err) {
+        console.error('Error decoding token:', err);
+      }
+    }
+  }, []); // Empty dependency array to run this effect once when the component loads
+
   const handleLogout = async () => {
     try {
-      await axiosInstance('/user/logout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          username: user.name,
-          loginTime: loginTime,
-        }),
-      });
-
       // Clear session and redirect
-      logout();
+      localStorage.removeItem('token'); // Remove token from localStorage
       navigate('/users');
     } catch (err) {
       console.error('Failed to log out:', err);
@@ -30,8 +32,8 @@ const Navbar = () => {
     <header className="bg-blue-700 shadow-md p-2 flex justify-between items-center text-white">
       <div className="text-xl font-semibold">TVSSS</div>
       <div className="flex items-center space-x-4">
-      <span>Welcome, {user || 'Guest'}</span>
-      <button
+        <span>Welcome, {userName || 'User'}</span> {/* Display name or fallback to 'User' */}
+        <button
           className="bg-blue-500 text-white px-4 py-2 rounded-lg"
           onClick={handleLogout}
         >

@@ -19,9 +19,9 @@ function App() {
            
           <Route path="/assets" element={<Layout><AssetList /></Layout>} /> {/* Assets List */}
           <Route path="/assets/:asno" element={<Layout><AssetDetail /></Layout>} /> {/* Asset Detail */}
-          <Route path="users/issues/:emno" element={<IssueForm />} />
+          <Route path="users/issues/" element={<IssueForm />} />
           {/* <Route path="/new-issue/:empId" element = {<NewIssuePage />}/> */}
-          <Route path="/new-issue/:empId" element={<NewIssuePage />} />
+          <Route path="/new-issue" element={<NewIssuePage />} />
           <Route path="/Asset-Issues" element={<Layout><AssetIssues /></Layout>} />
           <Route path = "/users" element={<UserLogin />} />
           </Routes>

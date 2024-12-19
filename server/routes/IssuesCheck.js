@@ -2,23 +2,51 @@ const express = require('express');
 const sql = require('mssql');
 const config = require('../dbconfig'); // Ensure this points to your DB configuration
 const router = express.Router();
-console.log('issue page');
-router.get('/a/:emp', async (req, res) => { // Corrected
-  const { emp } = req.params;
-  console.log('Inside fetch asset', emp);
-  if (!emp) {
-      return res.status(400).send('Employee ID is required');
-  }
+// console.log('issue page');
+const jwt = require("jsonwebtoken"); // Make sure to require jwt
+const secretKey = process.env.JWT_SECRET // Use the same secret key as in login route
+// console.log(secretKey);
+
+router.get('/a', async (req, res) => {
   try {
-      await sql.connect(config);
-      const result = await sql
-          .query(`SELECT t_asno ,t_nama FROM ttxtvs1109001 WHERE t_cusr = '${emp}'`);
-      // console.log('Query Result:', result.recordset);
-      res.json(result.recordset);
+    const authHeader = req.headers.authorization;
+  
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "No token provided or invalid format" });
+    }
+  
+    const token = authHeader.split(" ")[1];
+    let decoded;
+  
+    try {
+      decoded = jwt.verify(token, secretKey); // Decode the token and verify
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  
+    const emp = decoded.id; // Extract employee ID from decoded token
+    
+    if (!emp) {
+      return res.status(400).json({ message: "Employee ID not found in token" });
+    }
+  
+    // SQL Injection Protection using parameterized queries
+    await sql.connect(config);
+    const request = new sql.Request();
+    request.input('emp', sql.VarChar, emp); // Declare the parameter properly
+    const result = await request.query(`
+      SELECT t_asno, t_nama
+      FROM ttxtvs1109001
+      WHERE t_cusr = @emp
+    `);
+  
+    res.json(result.recordset); // Return the result as JSON
+  
   } catch (err) {
-      console.error('Error:', err.message);
-      res.status(500).send('Error fetching asset IDs');
+    console.error("Error:", err.message); // Log the exact error
+    res.status(500).json({ message: "Internal server error", error: err.message });
   }
+  
 });
 router.get('/list_emp', async (req, res) => {
   const query = `
@@ -26,12 +54,12 @@ router.get('/list_emp', async (req, res) => {
     FROM ttccom0019001 e 
     RIGHT JOIN ttxtvs1159001 i ON i.t_emno = e.t_emno
   `;
-  console.log('issue raised emp');
+  // console.log('issue raised emp');
   try {
     await sql.connect(config);
     const result = await sql.query(query); 
     const employees = result.recordset; 
-    console.log(employees);
+    // console.log(employees);
     res.status(200).json(employees);
   } catch (error) {
     console.error('Error fetching employee names:', error);
@@ -42,7 +70,7 @@ router.get('/list_emp', async (req, res) => {
 router.put('/updation/:id', async (req, res) => {
   const { id } = req.params; // Issue number (t_isno)
   const { t_ists, t_hcmt, t_cldt} = req.body; // Updated fields
-  console.log(id);
+  // console.log(id);
   const query = `
     UPDATE ttxtvs1159001
     SET t_ists = @t_ists,
@@ -92,9 +120,7 @@ router.get("/list",async(req,res)=>{
   }
 
 })
-router.put("/updation/:isno",async(req,res)=>{
-  console.log(req.params);
-})
+
 // router.get('/a/:empId', (req, res) => {
 //   const { empId } = req.params;
 //   // Example logic: Query your database using the empId
@@ -105,45 +131,58 @@ router.put("/updation/:isno",async(req,res)=>{
 
 
 
-router.get('/:emno', async (req, res) => {
+router.get('/', async (req, res) => {
     // console.log('inside');
     try {
-        // Get emno from the URL parameter
-        const { emno } = req.params;
-
-        // Validate that emno is provided
-        if (!emno) {
-            return res.status(400).json({ error: 'Employee number (emno) is required' });
-        }
-
-        // Connect to the database
-        await sql.connect(config);
-//console.log('Issues page - fetching issues for emno:', emno);
-
-        // Query to fetch issues based on emno
-        const result = await sql.query(`
-         SELECT 
-    t_isno, 
-    DATEADD(MINUTE, 330, t_isdt) AS t_isdt,  
-    a.t_nama, 
-    i.t_emno, 
-    i.t_idsc, 
-    i.t_ists, 
-    i.t_hcmt
-    
-FROM ttxtvs1159001 i left join ttxtvs1109001 a
-on i.t_asno = a.t_asno
-
-WHERE t_emno = '${emno}'`
-);
-
-        console.log('Query result:', result.recordset);
-
-        // Send the result as JSON response
-        res.json(result.recordset);
+      // 1. Get and validate the Authorization header
+      const authHeader = req.headers.authorization;
+  
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "No token provided or invalid format" });
+      }
+  
+      const token = authHeader.split(" ")[1];
+      // console.log("Token Received:", token);
+  
+      // 2. Verify the token and extract the employee ID
+      let decoded;
+      try {
+        decoded = jwt.verify(token, secretKey);
+        // console.log("Decoded Token:", decoded);
+      } catch (err) {
+        console.error("JWT Verification Error:", err.message);
+        return res.status(401).json({ message: "Invalid or expired token" });
+      }
+  
+      const empId = decoded.id; // Extract employee ID
+      // console.log("Employee ID from Token:", empId);
+  
+      if (!empId) {
+        return res.status(400).json({ message: "Employee ID not found in token" });
+      }
+  
+      // 3. Connect to the database and fetch issues
+      await sql.connect(config);
+      const result = await sql.query(`
+        SELECT 
+          t_isno, 
+          DATEADD(MINUTE, 330, t_isdt) AS t_isdt,  
+          a.t_nama, 
+          i.t_emno, 
+          i.t_idsc, 
+          i.t_ists, 
+          i.t_hcmt
+        FROM ttxtvs1159001 i 
+        LEFT JOIN ttxtvs1109001 a ON i.t_asno = a.t_asno
+        WHERE i.t_emno = '${empId}'`);
+  
+      // console.log("Query result:", result.recordset);
+  
+      // 4. Send response
+      res.json(result.recordset);
     } catch (err) {
-        console.error('Error fetching issues:', err);
-        res.status(500).json({ error: 'Failed to fetch issues' });
+      console.error("Error fetching issues:", err.message);
+      res.status(500).json({ error: "Failed to fetch issues", details: err.message });
     }
 });
 
@@ -153,7 +192,7 @@ WHERE t_emno = '${emno}'`
 router.post('/submit', async (req, res) => {
   const { t_isdt, t_asno, t_emno, t_idsc, t_ists, t_hcmt,t_cldt, t_Refcntd, t_Refcntu } = req.body;
 
-  console.log('issues submission');
+  // console.log('issues submission');
   await sql.connect(config);
 
   // Validate input
@@ -189,7 +228,7 @@ router.post('/submit', async (req, res) => {
           INSERT INTO ttxtvs1159001 (t_isno, t_isdt, t_asno, t_emno, t_idsc, t_ists, t_hcmt,t_cldt, t_Refcntd, t_Refcntu)
           VALUES (@t_isno, @t_isdt, @t_asno, @t_emno, @t_idsc, @t_ists, @t_hcmt, @t_cldt,@t_Refcntd, @t_Refcntu)
       `;
-      console.log(queryString);
+      // console.log(queryString);
       const request = new sql.Request();
       request.input('t_isno', sql.VarChar, newIssueNo);  // Pass the generated issue number
       request.input('t_isdt', sql.DateTime, t_isdt);
@@ -207,7 +246,7 @@ router.post('/submit', async (req, res) => {
         console.error('Error executing query:', err);
         res.status(500).json({ error: 'Failed to execute query' });
      });
-           console.log('Issue data stored successfully');
+          //  console.log('Issue data stored successfully');
       
       res.status(200).json({ message: 'Issue submitted successfully', issueNo: newIssueNo });
   } catch (err) {

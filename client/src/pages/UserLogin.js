@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import UserNavbar from "../components/UserNavbar";
 import axiosInstance from "../axiosInstance";
 import { useUser } from "./UserContext";
+
 const UserLogin = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -12,7 +13,7 @@ const UserLogin = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const { setUser } = useUser();
   const navigate = useNavigate();
-//   console.log(setUser);
+
   const validate = () => {
     const newErrors = {};
     if (!formData.username) newErrors.username = "Username is required.";
@@ -33,10 +34,14 @@ const UserLogin = () => {
       try {
         const response = await axiosInstance.post("/user/login", formData);
         if (response.data.status === "1") {
-         console.log(response.data.name);
-          setUser(response.data.name);  
+          const { token } = response.data; // Receive JWT token from backend
+          localStorage.setItem("token", token); // Store token securely in localStorage
+         
+          setUser(response.data.name); // Save user context
           console.log("Login successful:", response.data);
-          navigate(`issues/${formData.username}`);
+          console.log("Stored Token:", localStorage.getItem("token")); 
+
+          navigate("/users/issues"); // Secure navigation without employee ID
         } else {
           setErrorMessage(response.data.message || "Invalid credentials.");
         }

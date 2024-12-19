@@ -1,33 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
-import UserNavbar from '../components/UserNavbar';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import UserNavbar from "../components/UserNavbar";
+import axiosInstance from "../axiosInstance";
+
 const IssueForm = () => {
   const [issues, setIssues] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('');  // Define statusFilter state
-  // const [idFilter, setIdFilter] = useState('');
-  // const [descFilter, setDescFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-  const navigate = useNavigate(); // Use navigate instead of history
-  const { emno } = useParams(); // Get the empId from the URL parameters
-
-  console.log(emno);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const navigate = useNavigate();
+  let token = localStorage.getItem("token");
   useEffect(() => {
-    // Fetch issues from the backend with filters
-    axios.get(`http://localhost:3001/issues/${emno}`)
-      .then(response => {
+    const fetchIssues = async () => {
+      
+      try {
+         // Get token from localStorage
+        if (!token) {
+           console.log('No token found');
+          return;
+        }
+
+        const response = await axiosInstance.get("/issues", {
+          headers: {
+            Authorization: `Bearer ${token}` // Pass token in the header
+          },
+        });
+
+        console.log("Issues fetched successfully:", response.data);
+        setIssues(response.data);
+        
+        console.log("User Issues:", response.data);
+        
+
         let filteredIssues = response.data;
 
         // Apply filters
         if (statusFilter) {
           filteredIssues = filteredIssues.filter(issue => issue.t_ists === parseInt(statusFilter));
         }
-        // if (idFilter) {
-        //   filteredIssues = filteredIssues.filter(issue => issue.t_isno.toString().includes(idFilter));
-        // }
-        // if (descFilter) {
-        //   filteredIssues = filteredIssues.filter(issue => issue.t_idsc.toLowerCase().includes(descFilter.toLowerCase()));
-        // }
+
         if (dateFilter) {
           filteredIssues = filteredIssues.filter(issue => {
             const issueDate = new Date(issue.t_isdt);
@@ -36,23 +47,21 @@ const IssueForm = () => {
           });
         }
 
-        // Sort issues by date descending
+        // Sort issues
         filteredIssues = filteredIssues.sort((a, b) => new Date(b.t_isdt) - new Date(a.t_isdt));
-
         setIssues(filteredIssues);
-      })
-      .catch(error => {
-        console.error('Error fetching issues:', error);
-      });
-  }, [emno, statusFilter, dateFilter]); // Re-fetch data when filters change
+      } catch (error) {
+        console.error("Error fetching issues:", error);
+        // navigate("/login");
+      }
+    };
 
+    fetchIssues();
+  }, [statusFilter, dateFilter, navigate]);
   const handleNewIssue = () => {
-    console.log(emno);
-    navigate(`/new-issue/${emno}`);
+  
+    navigate("/new-issue", { state: { token } });
   };
-  
-  
-
   return (
     <> <UserNavbar />
     <div className="container p-8 text-sm">
