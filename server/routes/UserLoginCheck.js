@@ -95,23 +95,24 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
+  
+    
     const { username, password } = req.body;
-
+    console.log("Step 1: Received request", req.body);
     try {
       // Step 1: Call the external API
       const apiResponse = await axios.post("http://192.168.101.13:5202/hn_login", {
         user_id: username,
         password: password,
       });
-
+      console.log("Step 2: External API response", apiResponse.data);
       if (apiResponse.data.login_status === "1") {
         // Step 2: Fetch employee name from the database
         await sql.connect(config);
         const query = "SELECT t_nama FROM ttccom0019001 WHERE t_emno = @id";
         const request = new sql.Request();
         const result = await request.input("id", sql.VarChar, username).query(query);
-
+        console.log("Step 3: Database query result", result.recordset);
         if (result.recordset.length > 0) {
           const name = result.recordset[0].t_nama;
 
@@ -199,4 +200,19 @@ router.post('/logout', async (req, res) => {
 });
 
   
+router.get('/search', async (req, res) => {
+  const { query } = req.query;
+  try {
+    const results = await db.query(`
+      SELECT t_emno, t_nama 
+      FROM ttccom0019001 
+      WHERE t_emno LIKE $1 OR t_nama LIKE $2
+    `, [`%${query}%`, `%${query}%`]);
+    res.json(results.rows);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Error fetching users' });
+  }
+});
+
 module.exports = router;

@@ -112,7 +112,30 @@ router.get('/:asno/components', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch asset components' });
     }
 });
-
+router.get('/by-pin/:emp', async (req, res) => {
+    const { emp } = req.params;
+    
+    try {
+      // Connect to the database
+      await sql.connect(config);
+      
+      // Query to get assets for the given employee (user pin)
+      const request = new sql.Request();
+      request.input('emp', sql.VarChar, emp); // Parameterized query to avoid SQL injection
+      const result = await request.query(`
+        SELECT t_asno, t_nama
+        FROM ttxtvs1109001
+        WHERE t_cusr = @emp
+      `);
+      
+      // Send the result back as JSON
+      res.json(result.recordset);
+    } catch (error) {
+      console.error('Error fetching assets:', error);
+      res.status(500).json({ message: 'Failed to fetch assets' });
+    }
+  });
+  
 
 /// Route for Asset Movement Details
 router.get('/:asno/movement', async (req, res) => {

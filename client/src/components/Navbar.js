@@ -11,7 +11,14 @@ const Navbar = () => {
   // console.log(userName);
    return (
     <header className="bg-blue-700 shadow-md p-2 flex justify-between items-center text-white">
-      <div className="text-xl font-semibold text-white-800">TVSSS</div>
+      <div className="flex items-center">
+        <img
+          src="/images/tvss_logo.jpg"
+          alt="TVSSS Logo"
+          className="h-10 w-10 mr-2"
+        />
+        <div className="text-xl font-semibold text-white">TVSSS</div>
+      </div>
       <div className="flex items-center space-x-4">
         <span>Welcome, {"Admin"}</span> {/* Display the username */}
         <button

@@ -45,32 +45,37 @@ const NewIssuePage = () => {
     event.preventDefault();
 
     // Calculate IST time by subtracting 330 minutes
-    const date = new Date();
-    date.setMinutes(date.getMinutes() - 330); // Convert to IST
-
-    const timeInIST = date.toISOString(); // Store in ISO format
+    const date = new Date(); date.setMinutes(date.getMinutes() - 330); // Adjust for IST (UTC+5:30) 
+    const isoString = date.toISOString(); // Get the ISO string // Split the date string by "T" and join with a space const 
+    const dateParts = isoString.split("T"); 
+    const formattedDate = `${dateParts[0]} ${dateParts[1]}`;
+    // const timeInIST = date.toISOString();
 
     // Prepare the data to send to the backend
     const data = {
-      t_isdt: timeInIST,
+      t_isdt: formattedDate,
       t_asno: selectedAsset,
       t_emno: emp, // Using empId consistently here
       t_idsc: description,
       t_ists: 1,
-      t_hcmt: hardwareComment,
+      t_hcmt:'',
       t_cldt: new Date('1970-01-01').toISOString(), // Converts the date to a valid ISO string
       t_Refcntd: 0, // Default reference count (adjust as needed)
       t_Refcntu: 0,
     };
-
+      console.log(selectedAsset);
     // Send data to backend to store it in the database
     axiosInstance.post('/issues/submit', data)
-      .then(response => {
-        console.log("Backend", response);
-        setMessage('Issue submitted successfully');
-        setIsSuccess(true);
-        // navigate(`/issues/${emp}`); // Redirect to the issue list after submission
-      })
+    .then(response => {
+      console.log("Backend", response);
+      setMessage('Issue submitted successfully');
+      setIsSuccess(true);
+  
+      // Reload the page after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000); // 2000 milliseconds = 2 seconds
+    })
       .catch(error => {
         console.error('Error submitting the issue:', error);
         if (error.response) {

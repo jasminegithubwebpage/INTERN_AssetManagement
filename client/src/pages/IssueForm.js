@@ -65,7 +65,7 @@ const IssueForm = () => {
   return (
     <> <UserNavbar />
     <div className="container p-8 text-sm">
-      <h1 className="text-2xl font-semibold mb-6">Issues</h1>
+      <h1 className="text-2xl font-semibold mb-6">IT HARDWARE ISSUES</h1>
 
       {/* Filters for Issue Status and Reported Date */}
       <div className="mb-6 grid grid-cols-2 gap-4">
@@ -103,32 +103,32 @@ const IssueForm = () => {
 
       {/* Issue Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full table-auto">
+        <table className="min-w-full table-auto border border-black">
           <thead>
-            <tr>
-              <th className="px-4 py-2 text-left border-b">Issue ID</th>
-              <th className="px-4 py-2 text-left border-b">Asset Name</th>
-              <th className="px-4 py-2 text-left border-b">Description</th>
-              <th className="px-4 py-2 text-left border-b">Status</th>
-              <th className="px-4 py-2 text-left border-b">Reported On</th>
+            <tr className="border border-black">
+              <th className="px-4 py-2 text-left border-b border-black">Issue ID</th>
+              <th className="px-4 py-2 text-left border-b border-black">Hardware Name</th>
+              <th className="px-4 py-2 text-left border-b border-black">Issue Description</th>
+              <th className="px-4 py-2 text-left border-b border-black">Status</th>
+              <th className="px-4 py-2 text-left border-b border-black">Reported On</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody  className="border border-black">
             {issues.length === 0 ? (
               <tr>
                 <td colSpan="4" className="text-center py-4">No issues found.</td>
               </tr>
             ) : (
               issues.map((issue) => (
-                <tr key={issue.t_isno} className="border-b">
-                  <td className="px-4 py-2">{issue.t_isno}</td>
-                  <td className="px-4 py-2">{issue.t_nama}</td>
+                <tr key={issue.t_isno} className="border-b border-black">
+                  <td className="px-4 py-2 border-black">{issue.t_isno}</td>
+                  <td className="px-4 py-2 border-black">{issue.t_nama}</td>
 
-                  <td className="px-4 py-2">{issue.t_idsc}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 border-black">{issue.t_idsc}</td>
+                  <td className="px-4 py-2 border-black">
                     {issue.t_ists === 1 ? 'Open' : issue.t_ists === 2 ? 'In Progress' : 'Closed'}
                   </td>
-                  <td className="px-4 py-2">{new Date(issue.t_isdt).toLocaleString()}</td>
+                  <td className="px-4 py-2 border-black">{new Date(issue.t_isdt).toLocaleString()}</td>
                 </tr>
               ))
             )}

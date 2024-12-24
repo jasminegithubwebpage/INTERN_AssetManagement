@@ -30,7 +30,14 @@ const Navbar = () => {
 
   return (
     <header className="bg-blue-700 shadow-md p-2 flex justify-between items-center text-white">
-      <div className="text-xl font-semibold">TVSSS</div>
+       <div className="flex items-center">
+        <img
+          src="/images/tvss_logo.jpg"
+          alt="TVSSS Logo"
+          className="h-10 w-10 mr-2"
+        />
+        <div className="text-xl font-semibold text-white">TVSSS</div>
+      </div>
       <div className="flex items-center space-x-4">
         <span>Welcome, {userName || 'User'}</span> {/* Display name or fallback to 'User' */}
         <button

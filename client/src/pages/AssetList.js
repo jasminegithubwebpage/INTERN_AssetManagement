@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../axiosInstance';
+
 const AssetList = () => {
   const [assets, setAssets] = useState([]);
   const [filters, setFilters] = useState({
-    assetCode: '',
-    assetName: '',
-    category: '',
-    status: '',
-    employeeNumber: '',
-    employeeName: '',
-    department: '',
+    t_asno: '',
+    t_nama: '',
+    t_catg: '',
+    t_stat: '',
+    t_emno: '',
+    emp_name: '',
+    t_dsca: '',
   });
 
   const [filteredAssets, setFilteredAssets] = useState([]);
@@ -21,6 +21,7 @@ const AssetList = () => {
     const fetchAssets = async () => {
       try {
         const response = await axios.get('http://localhost:3001/assets'); // Adjust URL accordingly
+        console.log('Assets from backend:', response.data);
         setAssets(response.data);
       } catch (error) {
         console.error('Error fetching assets:', error);
@@ -34,16 +35,17 @@ const AssetList = () => {
     setFilteredAssets(
       assets.filter((asset) => {
         return (
-          String(asset.t_asno || '').toLowerCase().includes(filters.assetCode.toLowerCase()) &&
-          String(asset.t_nama).toLowerCase().includes(filters.assetName.toLowerCase()) &&
-          String(asset.t_catg).toLowerCase().includes(filters.category.toLowerCase()) &&
-          String(asset.t_stat).toLowerCase().includes(filters.status.toLowerCase()) &&
-          String(asset.t_emno || '').toLowerCase().includes(filters.employeeNumber.toLowerCase()) &&
-          String(asset.emp_name).toLowerCase().includes(filters.employeeName.toLowerCase()) &&
-          String(asset.t_dsca).toLowerCase().includes(filters.department.toLowerCase())
+          String(asset?.t_asno || '').toLowerCase().includes(filters.t_asno.toLowerCase()) &&
+          String(asset?.t_nama || '').toLowerCase().includes(filters.t_nama.toLowerCase()) &&
+          String(asset?.t_catg || '').toLowerCase().includes(filters.t_catg.toLowerCase()) &&
+          String(asset?.t_stat || '').toLowerCase().includes(filters.t_stat.toLowerCase()) &&
+          String(asset?.t_emno || '').toLowerCase().includes(filters.t_emno.toLowerCase()) &&
+          String(asset?.emp_name || '').toLowerCase().includes(filters.emp_name.toLowerCase()) &&
+          String(asset?.t_dsca || '').toLowerCase().includes(filters.t_dsca.toLowerCase())
         );
       })
     );
+    // console.log('Filtered Assets:', filteredAssets);
   }, [filters, assets]);
 
   // Handle filter changes
@@ -54,22 +56,31 @@ const AssetList = () => {
     });
   };
 
+  const columns = [
+    { key: 't_asno', label: 'Asset Code' },
+    { key: 't_nama', label: 'Asset Name' },
+    { key: 't_catg', label: 'Category' },
+    { key: 't_stat', label: 'Status' },
+    { key: 't_emno', label: 'Employee Number' },
+    { key: 'emp_name', label: 'Employee Name' },
+    { key: 't_dsca', label: 'Department' },
+  ];
+
   return (
-    <div className="container p-8 text-sm  transform -translate-y-12">
+    <div className="container p-8 text-sm transform -translate-y-12">
       <table className="min-w-full table-auto border-collapse bg-white shadow-md">
         <thead className="bg-gray-100 w-20">
           <tr>
-            {/* Filter Inputs */}
-            {['AssetCode', 'AssetName', 'category', 'status', 'Emp_Number', 'Emp_Name', 'Dept'].map((col, index) => (
-              <th key={index} className="px-6 py-4 text-left font-semibold text-gray-700">
+            {columns.map((col) => (
+              <th key={col.key} className="px-6 py-4 text-left font-semibold text-gray-700">
                 <input
                   type="text"
                   className="px-2 py-1 border border-gray-300 rounded-lg w-full"
-                  placeholder={`Filter ${col.replace(/([A-Z])/g, ' $1').trim()}`}
-                  value={filters[col]}
-                  onChange={(e) => handleFilterChange(e, col)}
+                  placeholder={`Filter ${col.label}`}
+                  value={filters[col.key]} // Ensure `filters` keys match `col.key`
+                  onChange={(e) => handleFilterChange(e, col.key)}
                 />
-                {col.replace(/([A-Z])/g, ' $1').trim()}
+                {col.label}
               </th>
             ))}
             <th className="px-6 py-4 text-left font-semibold text-gray-700">Action</th>

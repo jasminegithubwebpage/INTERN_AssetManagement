@@ -9,14 +9,18 @@ import NewIssuePage from './pages/NewIssuePage';
 import AssetIssues from './pages/AssetIssues';
 import UserLogin from './pages/UserLogin';
 import { UserProvider } from './pages/UserContext';
+import AdminIssue from './pages/AdminIssue';
+import Helmet from 'react-helmet';
 function App() {
   return (
+   
   <UserProvider>
+     <Helmet> <title>TVSSS</title> </Helmet> 
     <Router>
       
       <Routes>
            <Route path="/" element={<Login />} />
-           
+           <Route path="/adminIssue"  element={<Layout> <AdminIssue /></Layout>} />
           <Route path="/assets" element={<Layout><AssetList /></Layout>} /> {/* Assets List */}
           <Route path="/assets/:asno" element={<Layout><AssetDetail /></Layout>} /> {/* Asset Detail */}
           <Route path="users/issues/" element={<IssueForm />} />

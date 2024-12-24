@@ -70,7 +70,7 @@ if (selectedEmp && selectedEmp.value !== "none") {
             );
           });
         }
-
+         
         // Search box filter (matches keyword in description or employee name)
         if (searchKeyword) {
           filteredIssues = filteredIssues.filter(
@@ -114,11 +114,19 @@ if (selectedEmp && selectedEmp.value !== "none") {
       })
       .catch((error) => console.error("Error updating issue:", error));
   };
+  const handleClick = () => {
+    navigate('/adminIssue'); // Navigate to admin page   
+  };
 
   return (
     <div className="container p-5 text-sm">
-      <h1 className="text-2xl font-semibold mb-6">Issues</h1>
-
+      <h1  className="text-2xl font-semibold mb-1">Issues</h1>
+      <button
+        onClick={handleClick}
+        className="px-4 py-2 mt-5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
+      >
+        Add New Issue
+      </button>
      {/* Filters */}
 <div className="mb-4 flex flex-wrap items-center gap-4">
   {/* Status Filter */}
@@ -179,7 +187,9 @@ if (selectedEmp && selectedEmp.value !== "none") {
         className="border border-gray-300 rounded px-3 py-1 w-40"
       />
     </div>
+    
   </div>
+ 
 </div>
 
 
@@ -188,43 +198,47 @@ if (selectedEmp && selectedEmp.value !== "none") {
         <thead>
           <tr className="border border-black">
             <th className="border border-black px-4 py-2">Issue ID</th>
+            <th className="border border-black px-4 py-2">Reported On</th>
             <th className="border border-black px-4 py-2">Asset ID</th>
             <th className="border border-black px-4 py-2">Asset Name</th>
             <th className="border border-black px-4 py-2">Employee Name</th>
             <th className="border border-black px-4 py-2">Employee ID</th>
             <th className="border border-black px-4 py-2">Description</th>
-            <th className="border border-black px-4 py-2">Status</th>
-            <th className="border border-black px-4 py-2">Reported On</th>
+           
+            
             <th className="border border-black px-4 py-2">Actions</th>
+            <th className="border border-black px-4 py-2">Status</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="border border-black">
           {issues.length > 0 ? (
             issues.map((issue) => (
               <tr key={issue.t_isno} className="border border-black">
-                <td className="border px-4 py-2">{issue.t_isno}</td>
-                <td className="border px-4 py-2">{issue.t_asno}</td>
-                <td className="border px-4 py-2">{issue.t_nama}</td>
-                <td className="border px-4 py-2">{issue.empname}</td>
-                <td className="border px-4 py-2">{issue.t_emno}</td>
-                <td className="border px-4 py-2">{issue.t_idsc}</td>
-                <td className="border px-4 py-2">
-                  {issue.t_ists === 1
-                    ? "Open"
-                    : issue.t_ists === 2
-                    ? "In Progress"
-                    : "Closed"}
-                </td>
-                <td className="border px-4 py-2">
+                <td className="border border-black px-4 py-2">{issue.t_isno}</td>
+                <td className="border border-black px-4 py-2">
                   {new Date(issue.t_isdt).toLocaleString()}
                 </td>
-                <td className="border px-4 py-2">
+                <td className="border border-black px-4 py-2">{issue.t_asno}</td>
+                <td className="border border-black px-4 py-2">{issue.t_nama}</td>
+                <td className="border border-black px-4 py-2">{issue.empname}</td>
+                <td className="border border-black px-4 py-2">{issue.t_emno}</td>
+                <td className="border border-black px-4 py-2">{issue.t_idsc}</td>
+                
+               
+                <td className="border border-black px-4 py-2">
                   <button
                     onClick={() => handleEditClick(issue)}
                     className="text-blue-500 underline"
                   >
                     Edit
                   </button>
+                </td>
+                <td className="border border-black px-4 py-2">
+                  {issue.t_ists === 1
+                    ? "Open"
+                    : issue.t_ists === 2
+                    ? "In Progress"
+                    : "Closed"}
                 </td>
               </tr>
             ))
